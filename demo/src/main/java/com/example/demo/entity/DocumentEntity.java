@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name="documents")
@@ -18,5 +20,9 @@ public class DocumentEntity {
     private String type;
     //TODO confirmar tipo de dato de 'file'
     private String file;
-    private String state;
+    private String status;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name="requestentity_id")
+    @OnDelete(action= OnDeleteAction.CASCADE)
+    private RequestEntity request;
 }

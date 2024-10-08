@@ -24,7 +24,7 @@ public class ClientRepositoryTest {
     {
         //given
         ClientEntity clientEntity = new ClientEntity(
-                null,"12345678-9", "Alex", "Campos", 33, "aprobado",null, null);
+                null,"12345678-9", "Alex", "Campos", "2000-06-20", "aprobado",null, null);
         entityManager.persistAndFlush(clientEntity);
 
         //when

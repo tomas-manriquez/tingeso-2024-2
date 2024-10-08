@@ -19,7 +19,8 @@ public class ClientEntity {
     private String rut;
     private String first_name;
     private String last_name;
-    private Integer age;
+    //birthday YYYY-MM-DD
+    private String birthday;
     //'state' marca si esta en 'espera', 'validado'
     // o 'rechazado' como usuario
     private String state;

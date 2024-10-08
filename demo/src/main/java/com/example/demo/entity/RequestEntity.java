@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.util.List;
 
 @Entity
 @Table(name ="requests")
@@ -26,6 +27,8 @@ public class RequestEntity {
     private Float annualInterest;
     private Float maxFinanceAmount;
     //State: "E1" hasta "E9" segun enunciado
-    private String state;
-    //TODO docs
+    private String status;
+    //"id" es el id de DocumentEntity
+    @OneToMany(mappedBy = "id")
+    private List<DocumentEntity> documentList;
 }
