@@ -82,12 +82,36 @@ public class ClientService {
 
     //P2: Registro de usuario
     //Verifica datos basicos de usuario, y si son validos, habilita documentos a ejecutivos para validacion
-    //Entrada: rut(numeros seguidos con guion), firstName (String), lastName (String), age (Int), 2 documentos (id + ingresos)
-    //Salida: String indicando estado actual de registro de usuario:
-    //'registro invalido' + razon de rechazo por input basico
-    //'registro en espera de validacion de ejecutivo' cuando se habilita para validacion de ejecutivos
-    public String signIn(String rut, String firstName, String lastName, String birthday, DocumentEntity idFile, DocumentEntity incomeFile)
-    {
-        return null;
+    //Entrada: objeto ClientEntity
+    //Salida: void. Como efecto secundario, actualiza el atributo 'status' segun validez de datos minimos...
+    //... y que los documentos sean validos para registrar un usuario
+    public void clientRegister(ClientEntity client) {
+        //verificar que no este previamente registrado
+        if(!client.getStatus().equals("validado"))
+        {
+            LocalDate birthday = LocalDate.parse(client.getBirthday());
+
+            if(birthday.isBefore(LocalDate.now().minusYears(18)))
+            {
+                if(client.getDocuments().isEmpty())
+                {
+                    client.setStatus("espera");
+                    updateClient(client);
+                }
+                else
+                {
+                    if(client.isHasValidDocuments())
+                    {
+                        client.setStatus("validado");
+                        updateClient(client);
+                    }
+                    else
+                    {
+                        client.setStatus("espera");
+                        updateClient(client);
+                    }
+                }
+            }
+        }
     };
 }

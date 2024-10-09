@@ -35,7 +35,7 @@ public class RequestEntity {
     private boolean hasSufficientDocuments;
     private Long monthlyCreditFee;
     private Long monthlyClientIncome;
-    private boolean hasGoodCreditHistory;
+    private Boolean hasGoodCreditHistory;
     //en meses (!)
     private Integer currentJobAntiquity;
     @ElementCollection

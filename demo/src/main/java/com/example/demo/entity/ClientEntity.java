@@ -31,5 +31,5 @@ public class ClientEntity {
 
     @OneToMany(mappedBy = "client")
     private List<DocumentEntity> documents;
-
+    private boolean hasValidDocuments;
 }
