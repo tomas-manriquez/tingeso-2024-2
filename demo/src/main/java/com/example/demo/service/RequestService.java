@@ -8,6 +8,7 @@ import com.example.demo.repository.RequestRepository;
 import org.apache.coyote.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.ObjectError;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -175,7 +176,8 @@ public class RequestService {
         if (clientRepository.findByRut(requestNew.getClientRut()).isPresent())
         {
             if (requestNew.getType()!= null && requestNew.getMaxPayTerm() != null
-            && requestNew.getAnnualInterest() != null & requestNew.getMaxFinanceAmount() != null)
+            && requestNew.getAnnualInterest() != null && requestNew.getMaxFinanceAmount() != null
+            && requestNew.getIsSelfEmployed() != null && requestNew.getMonthlyDebt() != null)
             {
                 if (requestNew.getDocuments().isEmpty())
                 {
@@ -205,6 +207,8 @@ public class RequestService {
             return false;
         }
     }
+
+
 
     //P5: Seguimiento de Solicitudes
     //Retorna el estado de una solicitud
@@ -249,6 +253,58 @@ public class RequestService {
             return "Cancelado: Solicitud no existe / no se encontro";
         }
     };
+
+    //P6:Calculo de Costos Totales
+    public Double totalMonthlyFee(RequestEntity request, ArrayList<Object> extraFees)
+    {
+        Double totalCreditAmount = (request.getPropertyValue() * request.getMaxFinanceAmount());
+        Double result = creditSimulation(
+                request.getClientRut(),
+                request.getType(),
+                totalCreditAmount.longValue(),
+                request.getAnnualInterest(),
+                request.getMaxPayTerm());
+
+        for(int i=0; i<extraFees.size(); i++)
+        {
+            if(extraFees.get(i) instanceof Double)
+            {
+                Double aux = totalCreditAmount *  ((Double) extraFees.get(i)).floatValue();
+                result = result + aux;
+            }
+            else
+            {
+                result = result + (Double) extraFees.get(i);
+            }
+        }
+        return result;
+    }
+
+    //P6: Calculo de costos totales
+    public Double totalFee(RequestEntity request, ArrayList<Object> extraFees)
+    {
+        Double totalCreditAmount = (request.getPropertyValue() * request.getMaxFinanceAmount());
+        Double result = creditSimulation(
+                request.getClientRut(),
+                request.getType(),
+                totalCreditAmount.longValue(),
+                request.getAnnualInterest(),
+                request.getMaxPayTerm());
+
+        for(int i=0; i<extraFees.size(); i++)
+        {
+            if(extraFees.get(i) instanceof Double)
+            {
+                Double aux = totalCreditAmount *  ((Double) extraFees.get(i)).floatValue();
+                result = result + aux;
+            }
+            else
+            {
+                result = result + (Double) extraFees.get(i);
+            }
+        }
+        return result * 12 * request.getMaxPayTerm();
+    }
 
 
 
