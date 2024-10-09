@@ -17,12 +17,15 @@ public class DocumentEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(unique=true, nullable = false)
     private Long id;
+    private String name;
     private String type;
-    //TODO confirmar tipo de dato de 'file'
-    private String file;
-    private String status;
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name="requestentity_id")
-    @OnDelete(action= OnDeleteAction.CASCADE)
+    @Lob
+    private byte[] file;
+    //para Client
+    @ManyToOne
+    private ClientEntity client;
+    //para Request
+    @ManyToOne
     private RequestEntity request;
+
 }

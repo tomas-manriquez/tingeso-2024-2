@@ -5,9 +5,11 @@ import com.example.demo.entity.DocumentEntity;
 import com.example.demo.entity.RequestEntity;
 import com.example.demo.repository.ClientRepository;
 import com.example.demo.repository.RequestRepository;
+import org.apache.coyote.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,6 +19,70 @@ public class RequestService {
     RequestRepository requestRepository;
     @Autowired
     ClientRepository clientRepository;
+
+    //METODOS PARA ACCEDER A CRUD
+
+    //CREATE solicitud
+    //Entrada: objeto RequestEntity
+    //Salida: el mismo objeto de entrada. Como efecto secundario, se guarda tal objeto en la base de datos
+    public RequestEntity saveRequest(RequestEntity request)
+    {
+        return requestRepository.save(request);
+    }
+
+    //READ todas las solicitudes
+    //Entrada: nada
+    //Salida: ArrayList de objetos RequestEntity, puede estar vacio
+    public ArrayList<RequestEntity> getRequests()
+    {
+        return (ArrayList<RequestEntity>) requestRepository.findAll();
+    }
+
+    //READ solicitud por su id en la base de datos
+    //Entrada: Long id
+    //Salida: objeto DocumentEntity si se encuentra en la base de datos, en otro caso null
+    public RequestEntity getRequestById(Long id)
+    {
+        Optional<RequestEntity> request = requestRepository.findById(id);
+        return  request.orElse(null);
+    }
+
+    //READ solicitud por el rut del cliente dueño en base de datos
+    //Entrada: String rut
+    //Salida: objeto RequestEntity si se encuentra en la base de datos, en otro caso null
+    public RequestEntity getRequestByClientRut(String rut)
+    {
+        Optional<RequestEntity> request = requestRepository.findByClientRut(rut);
+        return request.orElse(null);
+    }
+
+    //UPDATE solicitud en cualquiera de sus atributos
+    //Entrada: objeto RequestEntity con cambios
+    //el mismo objeto. Como efecto secundario, se actualiza el objeto con este id en la base de datos
+    //Por naturaleza de DocumentEntity y del negocio, se recomienda no usar.
+    public RequestEntity updateRequest(RequestEntity request)
+    {
+        return requestRepository.save(request);
+    }
+
+    //DELETE de solicitud por su id en la base de datos
+    //Entrada: Long id
+    //Salida: 'true' si se borra con exito, Exception en otro caso
+    public boolean deleteRequest(Long id) throws Exception
+    {
+        try
+        {
+            requestRepository.deleteById(id);
+            return true;
+        }
+        catch (Exception e)
+        {
+            throw new Exception(e.getMessage());
+        }
+    }
+
+    //METODOS PARA REGLAS DE NEGOCIO
+
 
     //P3: Solicitud de Credito
     //Entrada: String rut (de client), String requestType, Integer maxPayTerm, Float annualInterest, Float maxFinanceAmount, List<DocumentEntity> documentEntityList
@@ -116,6 +182,89 @@ public class RequestService {
         else
         {
             return "Cancelado: Solicitud no existe / no se encontro";
+        }
+    };
+
+
+    //P1: Simulacion de Credito Hipotecario
+    //Calcula cuota mensual de credito segun datos entregados por usuario y formula de enunciado
+    //Entrada: String rutClient, Long totalAmount (monto del prestamo, capital)...
+    //... Float annualFee, Integer payTerm (plazo en años de pago)
+    //Salida: Long simulation, =0L si algun input es incorrecto o usuario no es cliente
+    public Double creditSimulation(String rutClient, String creditType, Long totalAmount, Float annualFee, Integer payTerm)
+    {
+        double simulation = 0d;
+        Optional<ClientEntity> found = clientRepository.findByRut(rutClient);
+        if(found.isPresent())
+        {
+            if (totalAmount > 0L)
+            {
+                if (annualFee > 0L)
+                {
+                    float monthlyFee = (annualFee/12)/100;
+                    if(creditType.equals("vivienda1"))
+                    {
+                        if(payTerm <=30)
+                        {
+                            double totalPayTerms = payTerm*12;
+                            simulation = totalAmount * (monthlyFee*Math.pow(1+monthlyFee, totalPayTerms)/Math.pow(1+monthlyFee,totalPayTerms)-1);
+                        }
+                        return simulation;
+                    }
+                    else
+                    {
+                        if(creditType.equals("vivienda2"))
+                        {
+                            if(payTerm <=20)
+                            {
+                                double totalPayTerms = payTerm*12;
+                                simulation = totalAmount * (monthlyFee*Math.pow(1+monthlyFee, totalPayTerms)/Math.pow(1+monthlyFee,totalPayTerms)-1);
+                            }
+                            return simulation;
+                        }
+                        else
+                        {
+                            if(creditType.equals("comercial"))
+                            {
+                                if(payTerm<=25)
+                                {
+                                    double totalPayTerms = payTerm*12;
+                                    simulation = totalAmount * (monthlyFee*Math.pow(1+monthlyFee, totalPayTerms)/Math.pow(1+monthlyFee,totalPayTerms)-1);
+                                }
+                                return simulation;
+                            }
+                            else
+                            {
+                                if(creditType.equals("remodelacion"))
+                                {
+                                    if(payTerm<=15)
+                                    {
+                                        double totalPayTerms = payTerm*12;
+                                        simulation = totalAmount * (monthlyFee*Math.pow(1+monthlyFee, totalPayTerms)/Math.pow(1+monthlyFee,totalPayTerms)-1);
+                                    }
+                                    return simulation;
+                                }
+                                else
+                                {
+                                    return simulation;
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    return simulation;
+                }
+            }
+            else
+            {
+                return simulation;
+            }
+        }
+        else
+        {
+            return simulation;
         }
     };
 }

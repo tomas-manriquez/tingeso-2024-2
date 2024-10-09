@@ -16,6 +16,7 @@ public class RequestEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(unique = true, nullable = false)
     private Long id;
+    private String clientRut;
     //types:
     //"vivienda1" = para primera vivienda
     //"vivienda2" = para segunda vivienda
@@ -29,6 +30,18 @@ public class RequestEntity {
     //State: "E1" hasta "E9" segun enunciado
     private String status;
     //"id" es el id de DocumentEntity
-    @OneToMany(mappedBy = "id")
-    private List<DocumentEntity> documentList;
+    @OneToMany(mappedBy = "request")
+    private List<DocumentEntity> documents;
+    private boolean hasSufficientDocuments;
+    private Long monthlyCreditFee;
+    private Long monthlyClientIncome;
+    private boolean hasGoodCreditHistory;
+    //en meses (!)
+    private Integer currentJobAntiquity;
+    @ElementCollection
+    private List<Long> incomeHistory;
+    private Long monthlyDebt;
+    private Long bankAccountBalance;
+    @ElementCollection
+    private List<Long> bankAccountBalanceHistory;
 }
