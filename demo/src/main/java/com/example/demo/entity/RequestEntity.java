@@ -29,7 +29,7 @@ public class RequestEntity {
     private Integer maxPayTerm;
     private Float annualInterest;
     private Float maxFinanceAmount;
-    private Double propertyValue;
+    private Long propertyValue;
     //State: "E1" hasta "E9" segun enunciado
     private String status;
     //"id" es el id de DocumentEntity
@@ -50,5 +50,5 @@ public class RequestEntity {
     private Boolean hasGoodBalanceAccountAgeRate;
     private Boolean hasMadeBigWithdrawalsRecently;
     @ElementCollection
-    private ArrayList<Object> extraFees;
+    private ArrayList<Float> extraFees;
 }
