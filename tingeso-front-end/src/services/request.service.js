@@ -22,7 +22,22 @@ const remove = id => {
 }
 
 
-const simulate = data => {
-    return httpClient.get("/api/requests/calculate",{params:{data}});
+const simulate = (clientRut, capital, interesAnual, plazoPago) => {
+    return httpClient.get("/api/requests/calculate",{params:{clientRut, capital, interesAnual, plazoPago}});
 }
-export default { getAll, create, get, update, remove };
+
+const makeRequest = data =>
+{
+    return httpClient.post("/api/requests/makeRequest",data)
+}
+
+const evaluation = data =>
+{
+    return httpClient.put("/api/requests/evaluation",data)
+}
+
+const tracking = id =>
+{
+    return httpClient.get("/api/requests/status/${id}",id)
+}
+export default { getAll, create, get, update, remove, simulate, makeRequest, evaluation, tracking };

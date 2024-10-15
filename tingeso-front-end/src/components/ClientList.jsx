@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import employeeService from "../services/employee.service";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell, { tableCellClasses } from "@mui/material/TableCell";
@@ -12,22 +11,24 @@ import Button from "@mui/material/Button";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import clientService from "../services/client.service.js";
+import employee from "bootstrap/js/src/dom/selector-engine.js";
 
-const EmployeeList = () => {
-    const [employees, setEmployees] = useState([]);
+const ClientList = () => {
+    const [clients, setClients] = useState([]);
 
     const navigate = useNavigate();
 
     const init = () => {
-        employeeService
+        clientService
             .getAll()
             .then((response) => {
-                console.log("Mostrando listado de todos los empleados.", response.data);
-                setEmployees(response.data);
+                console.log("Mostrando listado de todos los clientes.", response.data);
+                setClients(response.data);
             })
             .catch((error) => {
                 console.log(
-                    "Se ha producido un error al intentar mostrar listado de todos los empleados.",
+                    "Se ha producido un error al intentar mostrar listado de todos los clientes.",
                     error
                 );
             });
@@ -40,18 +41,18 @@ const EmployeeList = () => {
     const handleDelete = (id) => {
         console.log("Printing id", id);
         const confirmDelete = window.confirm(
-            "¿Esta seguro que desea borrar este empleado?"
+            "¿Esta seguro que desea borrar este cliente?"
         );
         if (confirmDelete) {
-            employeeService
+            clientService
                 .remove(id)
                 .then((response) => {
-                    console.log("empleado ha sido eliminado.", response.data);
+                    console.log("cliente ha sido eliminado.", response.data);
                     init();
                 })
                 .catch((error) => {
                     console.log(
-                        "Se ha producido un error al intentar eliminar al empleado",
+                        "Se ha producido un error al intentar eliminar al cliente",
                         error
                     );
                 });
@@ -60,14 +61,14 @@ const EmployeeList = () => {
 
     const handleEdit = (id) => {
         console.log("Printing id", id);
-        navigate(`/employee/edit/${id}`);
+        navigate(`/client/edit/${id}`);
     };
 
     return (
         <TableContainer component={Paper}>
             <br />
             <Link
-                to="/employee/add"
+                to="/client/add"
                 style={{ textDecoration: "none", marginBottom: "1rem" }}
             >
                 <Button
@@ -75,7 +76,7 @@ const EmployeeList = () => {
                     color="primary"
                     startIcon={<PersonAddIcon />}
                 >
-                    Añadir Empleado
+                    Añadir Cliente
                 </Button>
             </Link>
             <br /> <br />
@@ -88,37 +89,38 @@ const EmployeeList = () => {
                         <TableCell align="left" sx={{ fontWeight: "bold" }}>
                             Nombre
                         </TableCell>
-                        <TableCell align="right" sx={{ fontWeight: "bold" }}>
-                            Sueldo
-                        </TableCell>
-                        <TableCell align="right" sx={{ fontWeight: "bold" }}>
-                            Nro.Hijos
-                        </TableCell>
-                        <TableCell align="right" sx={{ fontWeight: "bold" }}>
-                            Categoria
-                        </TableCell>
                         <TableCell align="left" sx={{ fontWeight: "bold" }}>
-                            Operaciones
+                           Apellido
                         </TableCell>
+                        <TableCell align="right" sx={{ fontWeight: "bold" }}>
+                            Cumpleaños
+                        </TableCell>
+                        <TableCell align="right" sx={{ fontWeight: "bold" }}>
+                            Estado
+                        </TableCell>
+                        <TableCell align="right" sx={{ fontWeight: "bold" }}>
+                            Documentos
+                        </TableCell>
+
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {employees.map((employee) => (
+                    {clients.map((client) => (
                         <TableRow
-                            key={employee.id}
+                            key={client.id}
                             sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                         >
-                            <TableCell align="left">{employee.rut}</TableCell>
-                            <TableCell align="left">{employee.name}</TableCell>
-                            <TableCell align="right">{employee.salary}</TableCell>
-                            <TableCell align="right">{employee.children}</TableCell>
-                            <TableCell align="right">{employee.category}</TableCell>
+                            <TableCell align="left">{client.rut}</TableCell>
+                            <TableCell align="left">{client.firstName}</TableCell>
+                            <TableCell align="right">{client.lastName}</TableCell>
+                            <TableCell align="right">{client.birthday}</TableCell>
+                            <TableCell align="right">{client.status}</TableCell>
                             <TableCell>
                                 <Button
                                     variant="contained"
                                     color="info"
                                     size="small"
-                                    onClick={() => handleEdit(employee.id)}
+                                    onClick={() => handleEdit(client.id)}
                                     style={{ marginLeft: "0.5rem" }}
                                     startIcon={<EditIcon />}
                                 >
@@ -129,7 +131,7 @@ const EmployeeList = () => {
                                     variant="contained"
                                     color="error"
                                     size="small"
-                                    onClick={() => handleDelete(employee.id)}
+                                    onClick={() => handleDelete(client.id)}
                                     style={{ marginLeft: "0.5rem" }}
                                     startIcon={<DeleteIcon />}
                                 >
@@ -144,4 +146,4 @@ const EmployeeList = () => {
     );
 };
 
-export default EmployeeList;
+export default ClientList;

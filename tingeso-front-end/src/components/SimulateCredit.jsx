@@ -9,27 +9,29 @@ import FormControl from "@mui/material/FormControl";
 import MenuItem from "@mui/material/MenuItem";
 
 const PaycheckCalculate = () => {
-    const [year, setYear] = useState("");
-    const [month, setMonth] = useState("");
-
+    const [clientRut, setClientRut] = useState("");
+    const [capital, setCapital] = useState("");
+    const [interesAnual, setInteresAnual] = useState("");
+    const [plazoPago, setPlazoPago] = useState("");
+    const [e, setResult] = useState(0);
     const navigate = useNavigate();
 
     const simulateCredit = (e) => {
         e.preventDefault();
-        console.log('Solicitar simular credito.', year, "-", month);
+        console.log('Solicitar simular credito.');
         paycheckService
-            .calculate(year, month)
+            .simulate(clientRut, capital, interesAnual, plazoPago)
             .then((response) => {
-                console.log("Planilla ha sido actualizada.", response.data);
-                navigate("/paycheck/list");
+                console.log("simulacion aceptada", response.data);
+                //navigate("/paycheck/list");
             })
             .catch((error) => {
                 console.log(
-                    "Ha ocurrido un error al intentar calcular liquidaciones de sueldos.",
+                    "Ha ocurrido un error al intentar calcular la simulacion: ",
                     error
                 );
             });
-        console.log("Fin calculo planilla.");
+        console.log("Fin calculo simulacion");
     };
 
     return (
@@ -40,42 +42,51 @@ const PaycheckCalculate = () => {
             justifyContent="center"
             component="form"
         >
-            <h3> Calcular Planilla Sueldos </h3>
+            <h3> Calcular Simulacion Credito </h3>
             <hr />
             <form>
                 <FormControl fullWidth>
                     <TextField
-                        id="year"
-                        label="Year"
-                        value={year}
+                        id="clientRut"
+                        label="ClientRut"
+                        value={clientRut}
                         variant="standard"
-                        onChange={(e) => setYear(e.target.value)}
+                        onChange={(e) => setClientRut(e.target.value)}
                     />
                 </FormControl>
 
                 <FormControl fullWidth>
                     <TextField
-                        id="month"
-                        label="Month"
-                        value={month}
+                        id="capital"
+                        label="Capital"
+                        value={capital}
+                        variant="standard"
+                        onChange={(e) => setCapital(e.target.value)}
+                    />
+                </FormControl>
+
+                <FormControl fullWidth>
+                    <TextField
+                        id="interesAnual"
+                        label="InteresAnual"
+                        value={interesAnual}
+                        variant="standard"
+                        onChange={(e) => setInteresAnual(e.target.value)}
+                    />
+                </FormControl>
+
+                <FormControl fullWidth>
+                    <TextField
+                        id="plazoPago"
+                        label="PlazoPago"
+                        value={plazoPago}
                         select
                         variant="standard"
                         defaultValue="1"
-                        onChange={(e) => setMonth(e.target.value)}
+                        onChange={(e) => setPlazoPago(e.target.value)}
                         style={{ width: "25%" }}
                     >
-                        <MenuItem value={1}>Enero</MenuItem>
-                        <MenuItem value={2}>Febrero</MenuItem>
-                        <MenuItem value={3}>Marzo</MenuItem>
-                        <MenuItem value={4}>Abril</MenuItem>
-                        <MenuItem value={5}>Mayo</MenuItem>
-                        <MenuItem value={6}>Junio</MenuItem>
-                        <MenuItem value={7}>Julio</MenuItem>
-                        <MenuItem value={8}>Agosto</MenuItem>
-                        <MenuItem value={9}>Septiembre</MenuItem>
-                        <MenuItem value={10}>Octubre</MenuItem>
-                        <MenuItem value={11}>Noviembre</MenuItem>
-                        <MenuItem value={12}>Diciembre</MenuItem>
+
                     </TextField>
                 </FormControl>
 
@@ -88,10 +99,13 @@ const PaycheckCalculate = () => {
                         style={{ marginLeft: "0.5rem" }}
                         startIcon={<CalculateIcon />}
                     >
-                        Calcular Liquidaciones
+                        Calcular Simulacion
                     </Button>
                 </FormControl>
             </form>
+            <div>
+                La cuota mensual del credito simulado es: {{e}}
+            </div>
         </Box>
     );
 };

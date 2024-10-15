@@ -1,137 +1,141 @@
-import * as React from "react";
-import { BarChart } from "@mui/x-charts/BarChart";
-import Box from "@mui/material/Box";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import RequestService from "../services/request.service.js";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell, { tableCellClasses } from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+import Button from "@mui/material/Button";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import MoreTimeIcon from '@mui/icons-material/MoreTime';
 
-const dataset = [
-    {
-        month: "Ene",
-        children_bonus: 1518032,
-        extra_hours: 3356291,
-        monthly_salary: 23845107,
-        salary_bonus: 1074392,
-        total_salary: 29793822,
-    },
-    {
-        month: "Feb",
-        children_bonus: 2058825,
-        extra_hours: 3831405,
-        monthly_salary: 23911193,
-        salary_bonus: 1988180,
-        total_salary: 31789603,
-    },
-    {
-        month: "Mar",
-        children_bonus: 1988296,
-        extra_hours: 6565229,
-        monthly_salary: 24241909,
-        salary_bonus: 1158963,
-        total_salary: 33954397,
-    },
-    {
-        month: "Abr",
-        children_bonus: 1033054,
-        extra_hours: 6154627,
-        monthly_salary: 22769864,
-        salary_bonus: 1078131,
-        total_salary: 31035676,
-    },
-    {
-        month: "May",
-        children_bonus: 1761147,
-        extra_hours: 5845755,
-        monthly_salary: 20726098,
-        salary_bonus: 1128416,
-        total_salary: 29461416,
-    },
-    {
-        month: "Jun",
-        children_bonus: 2367078,
-        extra_hours: 3006937,
-        monthly_salary: 24003152,
-        salary_bonus: 1360745,
-        total_salary: 30737912,
-    },
-    {
-        month: "Jul",
-        children_bonus: 1578067,
-        extra_hours: 3809051,
-        monthly_salary: 20168524,
-        salary_bonus: 1317233,
-        total_salary: 26872875,
-    },
-    {
-        month: "Ago",
-        children_bonus: 1820069,
-        extra_hours: 4269796,
-        monthly_salary: 21560874,
-        salary_bonus: 1206458,
-        total_salary: 28857197,
-    },
-    {
-        month: "Sep",
-        children_bonus: 2136203,
-        extra_hours: 3259034,
-        monthly_salary: 22418839,
-        salary_bonus: 1086556,
-        total_salary: 28900632,
-    },
-    {
-        month: "Oct",
-        children_bonus: 1584761,
-        extra_hours: 4371604,
-        monthly_salary: 23766348,
-        salary_bonus: 1472698,
-        total_salary: 31195411,
-    },
-    {
-        month: "Nov",
-        children_bonus: 1698817,
-        extra_hours: 7665834,
-        monthly_salary: 22879773,
-        salary_bonus: 1278495,
-        total_salary: 33522919,
-    },
-    {
-        month: "Dic",
-        children_bonus: 1209035,
-        extra_hours: 7770951,
-        monthly_salary: 23324507,
-        salary_bonus: 1350444,
-        total_salary: 33654937,
-    },
-];
+const RequestList = () => {
+    const [request, setRequest] = useState([]);
 
-const valueFormatter = (value) => `$ ${value.toLocaleString("en-US")}`;
+    const navigate = useNavigate();
 
-export default function AnualReport() {
+    const init = (id) => {
+        RequestService
+            .get(id)
+            .then((response) => {
+                console.log("Mostrando la Solicitude", response.data);
+                setRequest(response.data);
+            })
+            .catch((error) => {
+                console.log(
+                    "Se ha producido un error al intentar mostrar la Solicitud.",
+                    error
+                );
+            });
+    };
+
+    useEffect(() => {
+        init(id);
+    }, []);
+
+    //se elimino opcion de eliminar request desde menu de estado: borrar solamente desde lista
+    const handleDelete = (id) => {
+        console.log("Printing id", id);
+        const confirmDelete = window.confirm(
+            "¿Esta seguro que desea borrar esta Solicitud?"
+        );
+        if (confirmDelete) {
+            RequestService
+                .remove(id)
+                .then((response) => {
+                    console.log("Solicitud ha sido eliminada.", response.data);
+                    init();
+                })
+                .catch((error) => {
+                    console.log(
+                        "Se ha producido un error al intentar eliminar la Solicitud",
+                        error
+                    );
+                });
+        }
+    };
+
+    const handleEdit = (id) => {
+        console.log("Printing id", id);
+        navigate(`/request/edit/${id}`);
+    };
+
     return (
-        <Box
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            justifyContent="center"
-        >
-            <BarChart
-                width={1000}
-                height={450}
-                margin={{ top: 100, right: 10, left: 150, bottom: 20 }}
-                xAxis={[{ scaleType: "band", dataKey: "month", align: "center" }]}
-                dataset={dataset}
-                series={[
-                    {
-                        dataKey: "monthly_salary",
-                        label: "Monthly Salary",
-                        valueFormatter,
-                    },
-                    { dataKey: "salary_bonus", label: "Salary Bonus", valueFormatter },
-                    { dataKey: "extra_hours", label: "Extra Hours", valueFormatter },
-                    {
-                        dataKey: "children_bonus",
-                        label: "Children Bonus",
-                        valueFormatter,
-                    },
-                ]}
-            />
-        </Box>
+        <TableContainer component={Paper}>
+            <br />
+            <Link
+                to="/request/add"
+                style={{ textDecoration: "none", marginBottom: "1rem" }}
+            >
+                <Button
+                    variant="contained"
+                    color="primary"
+                    startIcon={<MoreTimeIcon />}
+                >
+                    Ingresar Horas Extra
+                </Button>
+            </Link>
+            <br /> <br />
+            <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
+                <TableHead>
+                    <TableRow>
+                        <TableCell align="right" sx={{ fontWeight: "bold" }}>
+                            Rut Cliente
+                        </TableCell>
+                        <TableCell align="right" sx={{ fontWeight: "bold" }}>
+                            Tipo
+                        </TableCell>
+                        <TableCell align="right" sx={{ fontWeight: "bold" }}>
+                            Estado
+                        </TableCell>
+                        <TableCell align="right">
+
+                        </TableCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {request => (
+                        <TableRow
+                            key={request.id}
+                            sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                        >
+                            <TableCell align="left">{request.clientRut}</TableCell>
+                            <TableCell align="left">{request.type}</TableCell>
+                            <TableCell align="right">{request.status}</TableCell>
+                            <TableCell>
+                                <Button
+                                    variant="contained"
+                                    color="info"
+                                    size="small"
+                                    onClick={() => handleEdit(request.id)}
+                                    style={{ marginLeft: "0.5rem" }}
+                                    startIcon={<EditIcon />}
+                                >
+                                    Editar
+                                </Button>
+
+                                <Button
+                                    variant="contained"
+                                    color="error"
+                                    size="small"
+                                    onClick={() => handleDelete(request.id)}
+                                    style={{ marginLeft: "0.5rem" }}
+                                    startIcon={<DeleteIcon />}
+                                >
+                                    Eliminar
+                                </Button>
+                            </TableCell>
+                        </TableRow>
+                    )}
+                </TableBody>
+            </Table>
+        </TableContainer>
     );
-}
+};
+
+export default RequestStatus;

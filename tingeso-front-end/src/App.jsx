@@ -22,7 +22,7 @@ function App() {
                     <Route path="/client/edit/:id" element={<AddEditClient/>} />
                     <Route path="/request/list" element={<RequestList/>} />
                     <Route path="/request/calculate" element={<SimulateCredit/>} />
-                    <Route path="/request/status" element={<RequestStatus/>} />
+                    <Route path="/request/status/:id" element={<RequestStatus/>} />
                     <Route path="/request/add" element={<AddEditRequest/>} />
                     <Route path="/request/edit/:id" element={<AddEditRequest/>} />
                     <Route path="*" element={<NotFound/>} />
