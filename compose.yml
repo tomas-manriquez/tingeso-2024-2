@@ -1,0 +1,27 @@
+version: "3.8"
+services:
+    frontend:
+        container_name: frontend
+        #imagen base, deberia existir en el PC y en docker hub
+        image: tomas-manriquez/front-end:latest
+        #TODO imagen
+        ports:
+            - "8070:80"
+        #Si llega a ocurrir un error al container, levantarlo de nuevo
+        deploy:
+            restart_policy:
+                condition: on-failure
+
+    backend:
+        container_name: backend
+        image: tomas-manriquez/demo:latest
+        #TODO imagen
+        ports:
+            - "8090:8090"
+        #variable de ambiente para conectarse a base de datos postgres
+        environment:
+            - DB_HOST=158.170.2.91
+        #Si llega a ocurrir un error al container, levantarlo de nuevo
+        deploy:
+            restart_policy:
+                condition: on-failure
