@@ -77,15 +77,16 @@ public class ClientService {
         }
     }
 
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
     //METODOS PARA REGLAS DE NEGOCIO
 
 
     //P2: Registro de usuario
     //Verifica datos basicos de usuario, y si son validos, habilita documentos a ejecutivos para validacion
     //Entrada: objeto ClientEntity
-    //Salida: void. Como efecto secundario, actualiza el atributo 'status' segun validez de datos minimos...
-    //... y que los documentos sean validos para registrar un usuario
-    public void clientRegister(ClientEntity client) {
+    //Salida: clientEntity actualizado. Como efecto secundario, actualiza el atributo 'status' segun ...
+    // validez de datos minimos y que los documentos sean validos para registrar un usuario
+    public ClientEntity clientRegister(ClientEntity client) {
         //verificar que no este previamente registrado
         if(!client.getStatus().equals("validado"))
         {
@@ -113,5 +114,6 @@ public class ClientService {
                 }
             }
         }
+        return client;
     };
 }

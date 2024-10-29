@@ -227,20 +227,20 @@ public class RequestService {
 
     //P4: Evaluacion de Credito
     //Entrada: RequestEntity request
-    //Salida: nada. Como efecto secundario, se altera el 'status' del RequestEntity de entrada segun reglas de negocio
-    public void requestEvaluation(RequestEntity request)
+    //Salida: Request actualizado. Como efecto secundario, se altera el 'status' del RequestEntity de entrada segun reglas de negocio
+    public RequestEntity requestEvaluation(RequestEntity request)
     {
         if (requestRepository.findById(request.getId()).isPresent())  //solicitud existe en Base de Datos
         {
             if(request.getStatus().equals("E2") && request.getDocuments().isEmpty())
             {
                 //Solicitud en estado Pendiente de Documentacion y aun no tiene documentos, nada que evaluar
-                return;
+                return request;
             }
             if(request.getStatus().equals("E7") || request.getStatus().equals("E8") || request.getStatus().equals("E9") || request.getStatus().equals("E6"))
             {
                 //credito aceptado, rechazado, cancelado o en desembolso, nada que evaluar
-                return;
+                return request;
             }
             else
             {
@@ -260,13 +260,13 @@ public class RequestService {
                         {
                             request.setStatus("E3");
                             updateRequest(request);
-                            return;
+                            return request;
                         }
                         else    //actualizaron datos y no tiene documentos suficientes, pasa a E2 pendiente de documentacion
                         {
                             request.setStatus("E2");
                             updateRequest(request);
-                            return;
+                            return request;
                         }
                     }
                     request.setMonthlyDebt(totalCostMonthly(request));
@@ -275,13 +275,13 @@ public class RequestService {
                     {
                         request.setStatus("E7");
                         updateRequest(request);
-                        return;
+                        return request;
                     }
                     if (!request.getHasGoodCreditHistory()) //Falla R2, solicitud rechazada
                     {
                         request.setStatus("E7");
                         updateRequest(request);
-                        return;
+                        return request;
                     }
                     if(request.getIsSelfEmployed())
                     {
@@ -443,7 +443,7 @@ public class RequestService {
                         clientSavingCapacity = "moderada";
                         request.setStatus("E3");
                         updateRequest(request);
-                        return;
+                        return request;
                     }
                     if(savingCapacityRules < 2)
                     {
@@ -451,13 +451,13 @@ public class RequestService {
                         clientSavingCapacity = "insuficiente";
                         request.setStatus("E7");
                         updateRequest(request);
-                        return;
+                        return request;
                     }
 
                     //solicitud cumple con condiciones requeridas R1-R7, pasa a estado E4 pre-aprobada
                     request.setStatus("E4");
                     updateRequest(request);
-                    return;
+                    return request;
 
 
                 }
@@ -465,13 +465,13 @@ public class RequestService {
                 {
                     request.setStatus("E1");
                     updateRequest(request);
-                    return;
+                    return request;
                 }
             }
         }
         else    //Request entregado no existe en BD
         {
-            return;
+            return request;
         }
     }
 
@@ -580,8 +580,5 @@ public class RequestService {
     //Calcula el costo total (base por credito + seguros + comisiones) de cierto credito
     //Entrada: RequestEntity
     //Salida: Long costo total del credito
-    public Long totalCost(RequestEntity request)
-    {
-        return totalCostMonthly(request) * 12 * request.getMaxPayTerm();
-    }
+    public Long totalCost(RequestEntity request) {return totalCostMonthly(request) * 12 * request.getMaxPayTerm();}
 }

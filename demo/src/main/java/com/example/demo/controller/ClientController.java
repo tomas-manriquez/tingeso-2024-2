@@ -26,8 +26,8 @@ public class ClientController {
     @PostMapping("/")
     public ResponseEntity<ClientEntity> saveClient(@RequestBody ClientEntity client)
     {
-        ClientEntity clientNew = clientService.saveClient(client);
-        return ResponseEntity.ok(clientNew);
+        ClientEntity newClient = clientService.saveClient(client);
+        return ResponseEntity.ok(newClient);
     }
 
     //READ para todos los clientes
@@ -81,4 +81,17 @@ public class ClientController {
     }
 
     //METODOS PARA REGLAS DE NEGOCIO
+
+    //P2: Registro de usuario
+    //Verifica datos basicos de usuario, y si son validos, habilita documentos a ejecutivos para validacion
+    //Entrada: objeto ClientEntity
+    //Salida: Estado OK. Como efecto secundario, actualiza el atributo 'status' segun validez de datos minimos...
+    //... y que los documentos sean validos para registrar un usuario
+    @PostMapping("/register")
+    public ResponseEntity<ClientEntity> clientRegister(@RequestBody ClientEntity client)
+    {
+       ClientEntity newClient =  clientService.clientRegister(client);
+       return ResponseEntity.ok(newClient);
+
+    }
 }

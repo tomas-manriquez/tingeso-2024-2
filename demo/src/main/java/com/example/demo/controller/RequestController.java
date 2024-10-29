@@ -73,7 +73,7 @@ public class RequestController {
 
     //DELETE de solicitud por su id en la base de datos
     //Entrada: Long id
-    //Salida: 'true' si se borra con exito, Exception en otro caso
+    //Salida: Estado OK. 'true' si se borra con exito, Exception en otro caso
     @DeleteMapping("/{id}")
     public ResponseEntity<Boolean> deleteRequestById(@PathVariable("id") Long id) throws Exception
     {
@@ -83,93 +83,52 @@ public class RequestController {
 
     //METODOS PARA REGLAS DE NEGOCIO
 
-    //P3: Solicitud de Credito
-    //Entrada: String rut (de client), String requestType, Integer maxPayTerm, Float annualInterest, Float maxFinanceAmount, List<DocumentEntity> documentEntityList
-    //Salida: String "Solicitud ingresada con exito" =  se registra Solicitud en estado 'E3' asociado al cliente de id 'clientId' ...
-    //Salida: String "Solicitud ingresada, documentos pendientes para poder avanzar" = se registra Solicitud en estado 'E2' asociado al cliente de id 'clienteId'
-    //... String "Error en Solicitud:" + razon de error (aca se manejan errores segun las reglas de negocio)
-    /**
-    @PostMapping("")
-    private String makeRequest (String clientRut, String requestType, Integer payTerm, Float annualInterest, Float financeAmount, List<DocumentEntity> documentEntityList)
+    //P1: Simulacion de Credito Hipotecario
+    //Calcula cuota mensual de credito segun datos entregados por usuario y formula de enunciado
+    //Entrada: String rutClient, Long totalAmount (monto del prestamo, capital)...
+    //... Float annualFee, Integer payTerm (plazo en años de pago)
+    //Salida: estado OK, Long simulation, =0L si algun input es incorrecto o usuario no es cliente
+    @GetMapping("/simulation")
+    public ResponseEntity<Long> creditSimulation(@RequestParam String rutClient,
+                                                 @RequestParam String creditType,
+                                                 @RequestParam Long totalAmount,
+                                                 @RequestParam Float annualFee,
+                                                 @RequestParam Integer payTerm)
     {
-        //TODO clientRut contiene solo 1 "-"
-        if ((clientRut.length()==10 || clientRut.length()==9) && !clientRut.contains(".") && clientRut.contains("-"))
-        {
-            if(requestType.equals("vivienda1") || requestType.contains("vivienda2") || requestType.contains("comercial") || requestType.contains("remodelacion"))
-            {
-                //verificacion de montos por tipo de solicitud
-                switch (requestType)
-                {
-                    case "vivienda1":
-                        if(payTerm <=30)
-                        {
-                            if(annualInterest>=3.5f && annualInterest<=5.0f)
-                            {
-                                if(financeAmount> 0f &&  financeAmount<= 0.8f)
-                                {
-                                    if(!documentEntityList.isEmpty())
-                                    {
-                                        RequestEntity newRequest = new RequestEntity(
-                                                null,
-                                                "vivienda1",
-                                                payTerm,
-                                                annualInterest,
-                                                financeAmount,
-                                                "E2",
-                                                documentEntityList
-                                        );
-                                        return null;
-                                    }
-                                    else
-                                    {
-                                        return null;
-                                    }
-                                }
-                                else
-                                {
-                                    return "Error en Solicitud: monto de financiamiento no posible para tipo de solicitud (primera vivienda: maximo 80%)";
-                                }
-                            }
-                            else
-                            {
-                                return "Error en Solicitud: tasa de interes no posible para tipo de solicitud (primera vivienda: entre 3.5% y 5.0%)";
-                            }
-                        }
-                        else
-                        {
-                            return "Error en Solicitud: plazo no posible para tipo de solicitud (primera vivienda: maximo 30 años)";
-                        }
-                    default:
-                        return null;
-                }
-            }
-            else
-            {
-                return "Error en Solicitud: tipo de solicitud invalido";
-            }
-        }
-        else
-        {
-            return "Error en Solicitud: rut invalido (digitos sin puntos y con guion)";
-        }
-    };
+        Long result = requestService.creditSimulation(rutClient, creditType, totalAmount, annualFee, payTerm);
+        return ResponseEntity.ok(result);
+    }
 
-    //P5: Seguimiento de solicitudes
-    //Entrada: Long id de solicitud
-    //Salida: String estado de la solicitud, o "Error: input invalido" en caso de error
-    @GetMapping("/status/{id}")
-    public String requestTracking(@PathVariable("id") Long requestId)
+    //P3: Solicitud de Credito
+    //Entrada: RequestEntity request
+    //Salida: Estado OK. 'true' si se registro la solicitud con exito, 'false' en otro caso
+    //casos 'false' se generar por cliente solicitante que no esta registrado
+    @PostMapping("/makeRequest")
+    public ResponseEntity<Boolean> makeRequest(RequestEntity requestNew)
     {
-        if(requestId >= 0L)
-        {
-            return requestService.requestTracking(requestId);
-        }
-        else
-        {
-            return "Error: input invalido";
-        }
-    };
-    **/
+        Boolean success = requestService.makeRequest(requestNew);
+        return ResponseEntity.ok(success);
+    }
+
+    //P4: Evaluacion de Credito
+    //Entrada: RequestEntity request
+    //Salida: Estado OK. Como efecto secundario, se altera el 'status' del RequestEntity de entrada segun reglas de negocio
+    @PutMapping("/evaluation")
+    public ResponseEntity<RequestEntity> requestEvaluation(RequestEntity request)
+    {
+        RequestEntity updatedRequest = requestService.requestEvaluation(request);
+        return ResponseEntity.ok(updatedRequest);
+    }
+
+    //P5: Seguimiento de Solicitudes
+    //Retorna el estado de una solicitud
+    //Entrada: id de solicitud (Long)
+    //Salida: Estado OK. estado de la solicitud (String)
+    @GetMapping("/status/{id}")
+    public ResponseEntity<String> requestTracking (@PathVariable Long id)
+    {
+        return ResponseEntity.ok(requestService.requestTracking(id));
+    }
 
     //P5: Seguimiento de solicitudes
     //Entrada: Long id de solicitud, String estado nuevo
@@ -203,4 +162,13 @@ public class RequestController {
             return "Cancelado: nuevo estado invalido";
         }
     };
+
+    //P6: Calculo de Costos Totales
+    //Calcula el costo total (base por credito + seguros + comisiones) de cierto credito
+    //Entrada: RequestEntity
+    //Salida: Estado OK.Long costo total del credito
+    public ResponseEntity<Long> totalCost(RequestEntity request)
+    {
+        return ResponseEntity.ok(requestService.totalCost(request));
+    }
 }
