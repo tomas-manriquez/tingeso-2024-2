@@ -22,10 +22,10 @@ public class DocumentEntity {
     @Lob
     private byte[] file;
     //para Client
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private ClientEntity client;
     //para Request
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private RequestEntity request;
 
 }

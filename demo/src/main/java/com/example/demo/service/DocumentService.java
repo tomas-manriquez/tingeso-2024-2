@@ -1,12 +1,16 @@
 package com.example.demo.service;
 
+import com.example.demo.entity.ClientEntity;
 import com.example.demo.entity.DocumentEntity;
 import com.example.demo.entity.RequestEntity;
+import com.example.demo.repository.ClientRepository;
 import com.example.demo.repository.DocumentRepository;
+import com.example.demo.repository.RequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -17,6 +21,12 @@ import java.util.Optional;
 public class DocumentService{
     @Autowired
     DocumentRepository documentRepository;
+
+    @Autowired
+    ClientRepository clientRepository;
+
+    @Autowired
+    RequestRepository requestRepository;
 
     //METODOS PARA ACCEDER A CRUD
 
@@ -72,28 +82,38 @@ public class DocumentService{
 
     //METODOS PARA REGLAS DE NEGOCIO
 
-    public DocumentEntity store(MultipartFile file) throws IOException
+    //Recibe un MultipartFile (pdf) y lo guarda en la base de datos
+    //Entrada: MultipartFile, clientId, requestId
+    //Salida: DocumentEntity
+    public DocumentEntity store(MultipartFile file, Long clientId, Long requestId) throws IOException
     {
+        if(clientRepository.findById(clientId).isPresent() && requestRepository.findById(requestId).isPresent() )
+        {
+            //documento no puede pertenecer a un cliente y a un request a la vez, retorna nulo
+            return null;
+        }
         if(file != null)
         {
-            String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-            /**
-            DocumentEntity newFile = new DocumentEntity(
-                    fileName,
-                    file.getContentType(),
-                    file.getBytes(),
-                    null,
-                    null);
-            return documentRepository.save(newFile);
-             **/
-            return null;
+            DocumentEntity document = new DocumentEntity();
+            document.setName(file.getOriginalFilename());
+            document.setType(file.getContentType());
+            document.setFile(file.getBytes());
+            if(clientRepository.findById(clientId).isPresent())
+            {
+                ClientEntity client = clientRepository.findById(clientId).get();
+                document.setClient(client);
+            }
+            if(requestRepository.findById(requestId).isPresent())
+            {
+                RequestEntity request = requestRepository.findById(requestId).get();
+                document.setRequest(request);
+            }
+            return documentRepository.save(document);
         }
         else
         {
             return  null;
         }
     };
-
-
 
 }

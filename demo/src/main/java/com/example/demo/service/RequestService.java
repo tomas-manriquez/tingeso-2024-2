@@ -188,10 +188,10 @@ public class RequestService {
                 requestNew.setHasGoodCreditHistory(null);
                 requestNew.setIsSelfEmployed(null);
                 requestNew.setHasGoodIncomeHistory(null);
-                requestNew.setHasGoodBankAccountBalanceHistory(null);
-                requestNew.setHasGoodDepositHistory(null);
-                requestNew.setHasGoodBalanceAccountAgeRate(null);
-                requestNew.setHasMadeBigWithdrawalsRecently(null);
+                requestNew.setBiggestWithdrawalInLastYear(null);
+                requestNew.setTotalDepositsInLastYear(null);
+                requestNew.setBankAccountAge(null);
+                requestNew.setBiggestWithdrawalInLastSemester(null);
                 if (requestNew.getDocuments().isEmpty())
                 {
                     //campos requeridos completados pero no ingresa documentos
@@ -250,9 +250,9 @@ public class RequestService {
                         && request.getMonthlyClientIncome() != null && request.getHasGoodCreditHistory() != null
                         && request.getCurrentJobAntiquity() != null && request.getIsSelfEmployed() != null
                         && request.getHasGoodIncomeHistory() != null
-                        && request.getBankAccountBalance() != null && request.getHasGoodBankAccountBalanceHistory() != null
-                        && request.getHasGoodDepositHistory() != null && request.getHasGoodBalanceAccountAgeRate() != null
-                        && request.getHasMadeBigWithdrawalsRecently() != null)
+                        && request.getBankAccountBalance() != null && request.getBiggestWithdrawalInLastYear() != null
+                        && request.getTotalDepositsInLastYear() != null && request.getBankAccountAge() != null
+                        && request.getBiggestWithdrawalInLastSemester() != null)
                 {
                     if(request.getStatus().equals("E1")) //En revision inicial pero se actualizaron los datos
                     {
@@ -270,7 +270,7 @@ public class RequestService {
                         }
                     }
                     request.setMonthlyDebt(totalCostMonthly(request));
-                    float feeIncomeRate = (request.getMonthlyCreditFee().floatValue() / request.getMonthlyDebt().floatValue()) * 100;
+                    float feeIncomeRate = (request.getMonthlyCreditFee().floatValue() / request.getMonthlyDebt().floatValue());
                     if (feeIncomeRate > 0.35D) //Falla R1, solicitud rechazada
                     {
                         request.setStatus("E7");
@@ -410,22 +410,35 @@ public class RequestService {
                         savingCapacityRules++;
                     } //si no entra en este if, falla regla R71, punto negativo
 
-                    if(request.getHasGoodBankAccountBalanceHistory())
+                    if(request.getBiggestWithdrawalInLastYear() < (request.getBankAccountBalance()*0.5) )
                     {
                         //cumple regla R72, punto positivo
                         savingCapacityRules++;
                     } //si no entra en este if, falla regla R72, punto negativo
-                    if(request.getHasGoodDepositHistory())
+                    if(request.getTotalDepositsInLastYear() >= (request.getMonthlyClientIncome()*0.05) )
                     {
                         //cumple regla R73, punto positivo
                         savingCapacityRules++;
                     } //si no entra en este if, falla regla R73, punto negativo
-                    if(request.getHasGoodBalanceAccountAgeRate())
+                    if(request.getBankAccountAge() < 2)
                     {
-                        //cumple regla R74, punto positivo
-                        savingCapacityRules++;
-                    } //si no entra en este if, falla regla R74, punto negativo
-                    if (!request.getHasMadeBigWithdrawalsRecently())
+                        if(request.getBankAccountBalance() >= (request.getPropertyValue()*request.getMaxFinanceAmount()*0.2) )
+                        {
+                            //cumple regla R74, punto positivo
+                            savingCapacityRules++;
+                        }
+                        //si no entra en este if, falla regla R74, punto negativo
+                    }
+                    else    //request.getBankAccountAge >= 2
+                    {
+                        if(request.getBankAccountBalance() >= (request.getPropertyValue()*request.getMaxFinanceAmount()*0.1) )
+                        {
+                            //cumple regla R74, punto positivo
+                            savingCapacityRules++;
+                        }
+                        //si no entra en este if, falla regla R74, punto negativo
+                    }
+                    if (request.getBiggestWithdrawalInLastSemester() < (request.getPropertyValue()*request.getMaxFinanceAmount()*0.3))
                     {
                         //cumple regla R75, punto positivo
                         savingCapacityRules++;

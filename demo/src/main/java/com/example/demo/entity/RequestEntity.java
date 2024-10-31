@@ -44,11 +44,16 @@ public class RequestEntity {
     private Boolean isSelfEmployed;
     private Boolean hasGoodIncomeHistory;
     private Long monthlyDebt;
+    //Para P4.R7.R74
     private Long bankAccountBalance;
-    private Boolean hasGoodBankAccountBalanceHistory;
-    private Boolean hasGoodDepositHistory;
-    private Boolean hasGoodBalanceAccountAgeRate;
-    private Boolean hasMadeBigWithdrawalsRecently;
+    //Para P4.R7.R72
+    private Long biggestWithdrawalInLastYear;
+    //Para P4.R7.R73
+    private Long totalDepositsInLastYear;
+    //Para P4.R7.R74
+    private Integer bankAccountAge;                     //en años(!)
+    //Para P4.R7.R75
+    private Long biggestWithdrawalInLastSemester;
     @ElementCollection
     private ArrayList<Float> extraFees;
 }

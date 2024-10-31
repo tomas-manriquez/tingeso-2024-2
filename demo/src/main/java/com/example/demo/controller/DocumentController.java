@@ -4,11 +4,14 @@ import com.example.demo.entity.ClientEntity;
 import com.example.demo.entity.DocumentEntity;
 import com.example.demo.service.DocumentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -71,4 +74,31 @@ public class DocumentController {
     }
 
     //METODOS PARA REGLAS DE NEGOCIO
+
+    //Recibe un MultipartFile (pdf) y lo guarda en la base de datos
+    //Entrada: MultipartFile, clientId, requestId
+    //Salida: Estado OK. DocumentEntity
+    @PostMapping("/upload")
+    public ResponseEntity<DocumentEntity> store(@RequestBody MultipartFile file,
+                                                @RequestParam Long clientId,
+                                                @RequestParam Long requestId) throws IOException
+    {
+        DocumentEntity document = documentService.store(file, clientId, requestId);
+        return ResponseEntity.ok(document);
+    }
+
+    //READ documento por su id en la base de datos
+    //Entrada: Long id
+    //Salida: Estado OK. Archivo pdf si se encuentra en base de datos, en otro caso null
+    @GetMapping("/download/{id}")
+    public ResponseEntity<byte[]> downloadFile(@PathVariable Long id)
+    {
+            DocumentEntity document = documentService.getDocumentById(id);
+
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(document.getType()))
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + document.getName() + "\"")
+                    .body(document.getFile());
+    }
 }
