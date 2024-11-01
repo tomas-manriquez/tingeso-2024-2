@@ -2,13 +2,13 @@ import { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import clientService from "../services/client.service.js";
 import documentService from "../services/document.service.js";
-import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import FormControl from "@mui/material/FormControl";
 import MenuItem from "@mui/material/MenuItem";
 import SaveIcon from "@mui/icons-material/Save";
 import {Checkbox, FormControlLabel} from "@mui/material";
+import Box from "@mui/material/Box";
 
 const AddEditClient= () => {
     const [rut, setRut] = useState("");
