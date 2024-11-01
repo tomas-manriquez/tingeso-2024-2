@@ -4,18 +4,15 @@ import Drawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
 import Divider from "@mui/material/Divider";
 import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
-import PaidIcon from "@mui/icons-material/Paid";
 import CalculateIcon from "@mui/icons-material/Calculate";
 import AnalyticsIcon from "@mui/icons-material/Analytics";
 import DiscountIcon from "@mui/icons-material/Discount";
 import HailIcon from "@mui/icons-material/Hail";
-import MedicationLiquidIcon from "@mui/icons-material/MedicationLiquid";
 import MoreTimeIcon from "@mui/icons-material/MoreTime";
 import HomeIcon from "@mui/icons-material/Home";
 import { useNavigate } from "react-router-dom";
+import {ListItemIcon, ListItemText} from "@mui/material";
 
 export default function Sidemenu({ open, toggleDrawer }) {
     const navigate = useNavigate();
@@ -67,7 +64,7 @@ export default function Sidemenu({ open, toggleDrawer }) {
             <Divider />
 
             <List>
-                <ListItemButton onClick={() => navigate("/employee/add")}>
+                <ListItemButton onClick={() => navigate("/client/add")}>
                     <ListItemIcon>
                         <DiscountIcon />
                     </ListItemIcon>

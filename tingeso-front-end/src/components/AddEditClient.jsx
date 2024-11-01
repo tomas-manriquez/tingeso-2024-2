@@ -9,7 +9,6 @@ import FormControl from "@mui/material/FormControl";
 import MenuItem from "@mui/material/MenuItem";
 import SaveIcon from "@mui/icons-material/Save";
 import {Checkbox, FormControlLabel} from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
 
 const AddEditClient= () => {
     const [rut, setRut] = useState("");
@@ -184,7 +183,6 @@ const AddEditClient= () => {
                         value={birthday}
                         variant="standard"
                         onChange={(e) => setBirthday(e.target.value)}
-                        InputLabelProps={{ shrink: true }}
                         helperText="fecha de nacimiento"
                     />
                 </FormControl>
@@ -235,7 +233,7 @@ const AddEditClient= () => {
                             <Button onClick={() => downloadDocument(doc.id)} >
                                 Descargar
                             </Button>
-                            <Button onClick={() => deleteDocument(doc.id)} startIcon={<DeleteIcon />} color="error">
+                            <Button onClick={() => deleteDocument(doc.id)}  color="error">
                                 Eliminar
                             </Button>
                         </div>

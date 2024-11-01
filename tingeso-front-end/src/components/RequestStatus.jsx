@@ -3,18 +3,17 @@ import { Link, useNavigate } from "react-router-dom";
 import RequestService from "../services/request.service.js";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
-import TableCell, { tableCellClasses } from "@mui/material/TableCell";
+import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import MoreTimeIcon from '@mui/icons-material/MoreTime';
 
-const RequestList = () => {
+const RequestStatus = () => {
     const [request, setRequest] = useState([]);
 
     const navigate = useNavigate();
@@ -23,7 +22,7 @@ const RequestList = () => {
         RequestService
             .get(id)
             .then((response) => {
-                console.log("Mostrando la Solicitude", response.data);
+                console.log("Mostrando la Solicitud", response.data);
                 setRequest(response.data);
             })
             .catch((error) => {
@@ -34,7 +33,7 @@ const RequestList = () => {
             });
     };
 
-    useEffect(() => {
+    useEffect((id) => {
         init(id);
     }, []);
 
@@ -49,7 +48,7 @@ const RequestList = () => {
                 .remove(id)
                 .then((response) => {
                     console.log("Solicitud ha sido eliminada.", response.data);
-                    init();
+                    init(id);
                 })
                 .catch((error) => {
                     console.log(
@@ -77,7 +76,7 @@ const RequestList = () => {
                     color="primary"
                     startIcon={<MoreTimeIcon />}
                 >
-                    Ingresar Horas Extra
+                    Ingresar Solicitud
                 </Button>
             </Link>
             <br /> <br />
@@ -93,13 +92,10 @@ const RequestList = () => {
                         <TableCell align="right" sx={{ fontWeight: "bold" }}>
                             Estado
                         </TableCell>
-                        <TableCell align="right">
 
-                        </TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {request => (
                         <TableRow
                             key={request.id}
                             sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
@@ -131,8 +127,8 @@ const RequestList = () => {
                                 </Button>
                             </TableCell>
                         </TableRow>
-                    )}
                 </TableBody>
+
             </Table>
         </TableContainer>
     );

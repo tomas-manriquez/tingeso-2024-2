@@ -1,26 +1,25 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import RequestService from "../services/request.service.js";
+import requestService from "../services/request.service.js";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
-import TableCell, { tableCellClasses } from "@mui/material/TableCell";
+import TableCell  from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import MoreTimeIcon from '@mui/icons-material/MoreTime';
 
-const RequestsList = () => {
+const RequestList = () => {
     const [requests, setRequests] = useState([]);
 
     const navigate = useNavigate();
 
     const init = () => {
-        RequestService
+        requestService
             .getAll()
             .then((response) => {
                 console.log("Mostrando listado de todos las Solicitudes", response.data);
@@ -44,7 +43,7 @@ const RequestsList = () => {
             "¿Esta seguro que desea borrar esta Solicitud?"
         );
         if (confirmDelete) {
-            extraHoursService
+            requestService
                 .remove(id)
                 .then((response) => {
                     console.log("Solicitud ha sido eliminada.", response.data);
@@ -76,7 +75,7 @@ const RequestsList = () => {
                     color="primary"
                     startIcon={<MoreTimeIcon />}
                 >
-                    Ingresar Horas Extra
+                    Ingresar Solicitud
                 </Button>
             </Link>
             <br /> <br />
@@ -134,4 +133,4 @@ const RequestsList = () => {
     );
 };
 
-export default RequestsList;
+export default RequestList;

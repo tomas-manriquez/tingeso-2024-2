@@ -8,7 +8,6 @@ import FormControl from "@mui/material/FormControl";
 import MenuItem from "@mui/material/MenuItem";
 import SaveIcon from "@mui/icons-material/Save";
 import documentService from "../services/document.service.js";
-import DeleteIcon from "@mui/icons-material/Delete";
 import {Checkbox, FormControlLabel} from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 
@@ -286,7 +285,7 @@ const AddEditRequest = () => {
                             <Button onClick={() => downloadDocument(doc.id)} >
                                 Descargar
                             </Button>
-                            <Button onClick={() => deleteDocument(doc.id)} startIcon={<DeleteIcon />} color="error">
+                            <Button onClick={() => deleteDocument(doc.id)}  color="error">
                                 Eliminar
                             </Button>
                         </div>
@@ -420,7 +419,7 @@ const AddEditRequest = () => {
                             style={{ width: "150px", marginRight: "8px" }}
                         />
                         <IconButton onClick={() => removeExtraFee(index)} color="error">
-                            <DeleteIcon />
+                            Delete
                         </IconButton>
                     </Box>
                 ))}

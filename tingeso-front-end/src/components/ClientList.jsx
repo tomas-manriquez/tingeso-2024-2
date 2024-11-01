@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
-import TableCell, { tableCellClasses } from "@mui/material/TableCell";
+import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
@@ -97,9 +97,7 @@ const ClientList = () => {
                         <TableCell align="right" sx={{ fontWeight: "bold" }}>
                             Estado
                         </TableCell>
-                        <TableCell align="right" sx={{ fontWeight: "bold" }}>
-                            Documentos
-                        </TableCell>
+
 
                     </TableRow>
                 </TableHead>
