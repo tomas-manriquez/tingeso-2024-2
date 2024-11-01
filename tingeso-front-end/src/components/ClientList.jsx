@@ -12,7 +12,6 @@ import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import clientService from "../services/client.service.js";
-import employee from "bootstrap/js/src/dom/selector-engine.js";
 
 const ClientList = () => {
     const [clients, setClients] = useState([]);

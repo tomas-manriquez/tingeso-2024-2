@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import paycheckService from "../services/paycheck.service";
 import CalculateIcon from "@mui/icons-material/Calculate";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import FormControl from "@mui/material/FormControl";
 import MenuItem from "@mui/material/MenuItem";
+import requestService from "../services/request.service.js";
 
-const PaycheckCalculate = () => {
+const SimulateCredit= () => {
     const [clientRut, setClientRut] = useState("");
     const [capital, setCapital] = useState("");
     const [interesAnual, setInteresAnual] = useState("");
@@ -19,7 +19,7 @@ const PaycheckCalculate = () => {
     const simulateCredit = (e) => {
         e.preventDefault();
         console.log('Solicitar simular credito.');
-        paycheckService
+        requestService
             .simulate(clientRut, capital, interesAnual, plazoPago)
             .then((response) => {
                 console.log("simulacion aceptada", response.data);
@@ -110,4 +110,4 @@ const PaycheckCalculate = () => {
     );
 };
 
-export default PaycheckCalculate;
+export default SimulateCredit;

@@ -1,75 +1,136 @@
 import { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
-import employeeService from "../services/employee.service";
+import clientService from "../services/client.service.js";
+import documentService from "../services/document.service.js";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import FormControl from "@mui/material/FormControl";
 import MenuItem from "@mui/material/MenuItem";
 import SaveIcon from "@mui/icons-material/Save";
+import {Checkbox, FormControlLabel} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
 
-const AddEditEmployee = () => {
+const AddEditClient= () => {
     const [rut, setRut] = useState("");
-    const [name, setName] = useState("");
-    const [salary, setSalary] = useState("");
-    const [children, setChildren] = useState("");
-    const [category, setCategory] = useState("");
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
+    const [birthday, setBirthday] = useState("");
+    const [status, setStatus] = useState("");
+    const [hasValidDocuments, setHasValidDocuments] = useState(true);
+    const [documents, setDocuments] = useState([]);
+    const [newDocument, setNewDocument] = useState(null);
     const { id } = useParams();
-    const [titleEmployeeForm, setTitleEmployeeForm] = useState("");
+    const [titleClientForm, setTitleClientForm] = useState("");
     const navigate = useNavigate();
 
-    const saveEmployee = (e) => {
+    const saveClient= (e) => {
         e.preventDefault();
 
-        const employee = { rut, name, salary, children, category, id };
+        const client = { rut, firstName, lastName, birthday, status, hasValidDocuments, documents, id };
         if (id) {
-            //Actualizar Datos Empelado
-            employeeService
-                .update(employee)
+            //Actualizar Datos Empleado
+            clientService
+                .update(client)
                 .then((response) => {
                     console.log("Empleado ha sido actualizado.", response.data);
-                    navigate("/employee/list");
+                    navigate("/client/list");
                 })
                 .catch((error) => {
                     console.log(
-                        "Ha ocurrido un error al intentar actualizar datos del empleado.",
+                        "Ha ocurrido un error al intentar actualizar datos del cliente.",
                         error
                     );
                 });
         } else {
             //Crear nuevo empleado
-            employeeService
-                .create(employee)
+            clientService
+                .create(client)
                 .then((response) => {
                     console.log("Empleado ha sido añadido.", response.data);
-                    navigate("/employee/list");
+                    navigate("/client/list");
                 })
                 .catch((error) => {
                     console.log(
-                        "Ha ocurrido un error al intentar crear nuevo empleado.",
+                        "Ha ocurrido un error al intentar crear nuevo cliente.",
                         error
                     );
                 });
         }
     };
 
+    const uploadDocument = (e) => {
+        e.preventDefault();
+        if (!newDocument) return;
+
+        const formData = new FormData();
+        formData.append("file", newDocument);
+        formData.append("clientId", id);
+        formData.append("requestId", null); // Null porque siempre va a ser de un cliente, no de un request
+
+        documentService.upload(formData).then((response) => {
+            console.log("Documento subido al sistema.", response.data);
+            fetchDocuments(); // Refresh document list after upload
+        }).catch((error) => {
+            console.log("Error subiendo el documento.", error);
+        });
+    };
+
+    const downloadDocument = (documentId) => {
+        documentService.download(documentId).then((response) => {
+            const blob = new Blob([response.data], { type: response.headers['content-type'] });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;    //link con el que interactua el usuario
+            link.setAttribute('download', response.headers['content-disposition'].split('filename=')[1].replace(/"/g, '')); //nombre de archivo
+            document.body.appendChild(link);    //cuerpo del archivo (el contenido)
+            link.click();
+            link.remove();
+        }).catch((error) => {
+            console.log("Error descargando el documento.", error);
+        });
+    };
+
+    const deleteDocument = (documentId) => {
+        if (window.confirm("Está seguro que quiere eliminar el documento?")) {
+            documentService.remove(documentId).then(() => {
+                console.log("Documento eliminado.");
+                fetchDocuments(); //Actualizar lista de documentos
+            }).catch((error) => {
+                console.log("Error eliminando el documento.", error);
+            });
+        }
+    };
+
+    const fetchDocuments = async () => {
+        try {
+            const response = await documentService.getAll();
+            const clientDocuments = response.data.filter(doc => doc.clientId === id); //Filtrar para que sean del cliente
+            setDocuments(clientDocuments);
+        } catch (error) {
+            console.log("Error fetching documents:", error);
+        }
+    };
+
+
     useEffect(() => {
         if (id) {
-            setTitleEmployeeForm("Editar Empleado");
-            employeeService
+            setTitleClientForm("Editar Cliente");
+            clientService
                 .get(id)
-                .then((employee) => {
-                    setRut(employee.data.rut);
-                    setName(employee.data.name);
-                    setSalary(employee.data.salary);
-                    setChildren(employee.data.children);
-                    setCategory(employee.data.category);
+                .then((client) => {
+                    setRut(client.data.rut);
+                    setFirstName(client.data.firstName);
+                    setLastName(client.data.lastName);
+                    setBirthday(client.data.birthday);
+                    setStatus(client.data.children);
+                    setHasValidDocuments(client.data.hasValidDocuments);
                 })
                 .catch((error) => {
                     console.log("Se ha producido un error.", error);
                 });
         } else {
-            setTitleEmployeeForm("Nuevo Empleado");
+            setTitleClientForm("Nuevo Cliente");
         }
     }, []);
 
@@ -81,7 +142,7 @@ const AddEditEmployee = () => {
             justifyContent="center"
             component="form"
         >
-            <h3> {titleEmployeeForm} </h3>
+            <h3> {titleClientForm} </h3>
             <hr />
             <form>
                 <FormControl fullWidth>
@@ -97,60 +158,96 @@ const AddEditEmployee = () => {
 
                 <FormControl fullWidth>
                     <TextField
-                        id="name"
-                        label="Name"
-                        value={name}
+                        id="first_name"
+                        label="First Name"
+                        value={firstName}
                         variant="standard"
-                        onChange={(e) => setName(e.target.value)}
+                        onChange={(e) => setFirstName(e.target.value)}
                     />
                 </FormControl>
 
                 <FormControl fullWidth>
                     <TextField
-                        id="salary"
-                        label="Salary"
-                        type="number"
-                        value={salary}
+                        id="last_name"
+                        label="last Name"
+                        value={lastName}
                         variant="standard"
-                        onChange={(e) => setSalary(e.target.value)}
-                        helperText="Salario mensual en Pesos Chilenos"
+                        onChange={(e) => setLastName(e.target.value)}
                     />
                 </FormControl>
 
                 <FormControl fullWidth>
                     <TextField
-                        id="children"
-                        label="Children"
-                        type="number"
-                        value={children}
+                        id="birthday"
+                        label="Birthday"
+                        type="date"
+                        value={birthday}
                         variant="standard"
-                        onChange={(e) => setChildren(e.target.value)}
+                        onChange={(e) => setBirthday(e.target.value)}
+                        InputLabelProps={{ shrink: true }}
+                        helperText="fecha de nacimiento"
                     />
                 </FormControl>
 
                 <FormControl fullWidth>
                     <TextField
-                        id="category"
-                        label="Category"
-                        value={category}
-                        select
+                        id="status"
+                        label="Status"
+                        value={status}
                         variant="standard"
-                        defaultValue="A"
-                        onChange={(e) => setCategory(e.target.value)}
-                        style={{ width: "25%" }}
+                        onChange={(e) => setStatus(e.target.value)}
                     >
-                        <MenuItem value={"A"}>A</MenuItem>
-                        <MenuItem value={"B"}>B</MenuItem>
-                        <MenuItem value={"C"}>C</MenuItem>
+                        <MenuItem value="espera">Espera</MenuItem>
+                        <MenuItem value="validado">Validado</MenuItem>
+                        <MenuItem value="rechazado">Rechazado</MenuItem>
                     </TextField>
                 </FormControl>
+
+                <FormControlLabel
+                    control={
+                        <Checkbox
+                            checked={hasValidDocuments}
+                            onChange={(e) => setHasValidDocuments(e.target.checked)}
+                        />
+                    }
+                    label="Has Valid Documents"
+                />
+
+                {/* Subir documento */}
+                <FormControl fullWidth>
+                    <input type="file" onChange={(e) => setNewDocument(e.target.files[0])} />
+                    {/*startIcon={<UploadIcon />}*/}
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={uploadDocument} >
+                        Subir Documento a Sistema
+                    </Button>
+                </FormControl>
+
+                {/* Lista de documentos + descargar + eliminar*/}
+                {/*startIcon={<DownloadIcon />}*/}
+                <div>
+                    <h4>Documents</h4>
+                    {documents.length > 0 ? documents.map(doc => (
+                        <div key={doc.id}>
+                            <span>{doc.name}</span>
+                            <Button onClick={() => downloadDocument(doc.id)} >
+                                Descargar
+                            </Button>
+                            <Button onClick={() => deleteDocument(doc.id)} startIcon={<DeleteIcon />} color="error">
+                                Eliminar
+                            </Button>
+                        </div>
+                    )) : <p>No hay documentos disponibles.</p>}
+                </div>
 
                 <FormControl>
                     <br />
                     <Button
                         variant="contained"
                         color="info"
-                        onClick={(e) => saveEmployee(e)}
+                        onClick={(e) => saveClient(e)}
                         style={{ marginLeft: "0.5rem" }}
                         startIcon={<SaveIcon />}
                     >
@@ -159,9 +256,9 @@ const AddEditEmployee = () => {
                 </FormControl>
             </form>
             <hr />
-            <Link to="/employee/list">Back to List</Link>
+            <Link to="/client/list">Back to List</Link>
         </Box>
     );
 };
 
-export default AddEditEmployee;
+export default AddEditClient;
