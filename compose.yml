@@ -1,27 +1,133 @@
+#docker_load_balancing.yml
 version: "3.8"
-services:
-    frontend:
-        container_name: frontend
-        #imagen base, deberia existir en el PC y en docker hub
-        image: tomas-manriquez/front-end:latest
-        #TODO imagen
-        ports:
-            - "8070:80"
-        #Si llega a ocurrir un error al container, levantarlo de nuevo
-        deploy:
-            restart_policy:
-                condition: on-failure
 
-    backend:
-        container_name: backend
-        image: tomas-manriquez/demo:latest
-        #TODO imagen
-        ports:
-            - "8090:8090"
-        #variable de ambiente para conectarse a base de datos postgres
-        environment:
-            - DB_HOST=158.170.2.91
-        #Si llega a ocurrir un error al container, levantarlo de nuevo
-        deploy:
-            restart_policy:
-                condition: on-failure
+services:
+    #frontend
+  frontend1:
+    container_name: frontend1
+    image: tomasmanriquez480/frontend-image:latest
+    ports:
+      - "3001:3000"
+    networks:
+      - frontend-network
+    deploy:
+      restart_policy:
+        condition: on-failure
+
+  frontend2:
+    container_name: frontend2
+    image: tomasmanriquez480/frontend-image:latest
+    ports:
+      - "3002:3000"
+    networks:
+      - frontend-network
+    deploy:
+      restart_policy:
+        condition: on-failure
+
+  frontend3:
+    container_name: frontend3
+    image: tomasmanriquez480/frontend-image:latest
+    ports:
+      - "3003:3000"
+    networks:
+        - frontend-network
+    deploy:
+      restart_policy:
+        condition: on-failure
+
+  #backend
+  backend1:
+    container_name: backend1
+    image: tomasmanriquez480/backend-image:latest
+    ports:
+      - "8081:8080"
+    environment:
+      - DB_HOST=158.170.2.91
+    networks:
+      - backend-network
+
+  backend2:
+    container_name: backend2
+    image: tomasmanriquez480/backend-image:latest
+    ports:
+      - "8082:8080"
+    environment:
+      - DB_HOST=158.170.2.91
+    networks:
+      - backend-network
+    depends_on:
+      - postgres
+
+  backend3:
+    container_name: backend3
+    image: tomasmanriquez480/backend-image:latest
+    ports:
+      - "8083:8080"
+    environment:
+      - DB_HOST=158.170.2.91
+    networks:
+      - backend-network
+    depends_on:
+      - postgres
+
+
+  #DB
+  postgres:
+    container_name: database
+    image: postgres
+    deploy:
+      restart_policy:
+        condition: on-failure
+    volumes:
+      - database-volume:/var/lib/postgresql/data
+    networks:
+      - backend-network
+    environment:
+      POSTGRES_DB: Tingeso
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5435:5433" #Docker recomendo en "", si no funca sin ""
+      #ayudante tenia 5435:5432
+
+####
+  #frontload balancing
+  nginx-frontend:
+    container_name: nginx-frontend
+    image: nginx:latest
+    restart: always
+    ports:
+      - "8070:8070" #ayudante tiene puertos 8070:8070, antes yo lo puse '8070:80'
+    #volumen de persistencia en caso de que se caiga el container
+    volumes:
+    #uso de archivo en disco 'nginx-frontend.conf'
+      - ./nginx-frontend.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - frontend1
+      - frontend2
+      - frontend3
+    networks:
+      - frontend-network
+
+  #backload balancing
+  nginx-backend:
+    image: nginx:latest
+    ports:
+      - "80:80" #ayudante tiene puertos 80:80, yo tenia 8080:8080
+    #environment: DB_HOST, DB_PORT, DB_USERNAME, DB_PASSWORD
+    volumes:
+      - ./nginx-backend.conf:/etc/nginx/nginx.conf
+    depends_on:
+    #hace docker run de estos, en cuanto se haga docker run de nginx-backend
+      - backend1
+      - backend2
+      - backend3
+    networks:
+      - backend-network
+
+volumes:
+  database-volume:
+networks:
+  frontend-network:
+  backend-network:
