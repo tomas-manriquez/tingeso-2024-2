@@ -26,8 +26,8 @@ pipeline{
                     script{
                         withDockerRegistry(credentialsId: 'docker-credentials')
                         {
-                            bat "docker build -t tomasmanriquez480/backend-image:latest ."
-                            bat "docker push tomasmanriquez480/backend-image:latest"
+                            sh "docker build -t tomasmanriquez480/backend-image:latest ."
+                            sh "docker push tomasmanriquez480/backend-image:latest"
                         }
                     }
                 }
