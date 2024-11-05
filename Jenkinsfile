@@ -9,14 +9,14 @@ pipeline{
             steps{
                 checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/tomas-manriquez/tingeso-2024-2']])
                 dir("demo"){
-                    bat "mvn clean install"
+                    sh "mvn clean install"
 
             }
         }
         stage("Test"){
             steps{
                 dir("demo"){
-                    bat "mvn test"
+                    sh "mvn test"
                 }
             }
         }
