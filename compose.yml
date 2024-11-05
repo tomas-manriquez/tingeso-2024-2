@@ -41,7 +41,7 @@ services:
     container_name: backend1
     image: tomasmanriquez480/backend-image:latest
     ports:
-      - "8081:8080"
+      - "8091:8090"
     environment:
       - DB_HOST=158.170.2.91
     networks:
@@ -51,7 +51,7 @@ services:
     container_name: backend2
     image: tomasmanriquez480/backend-image:latest
     ports:
-      - "8082:8080"
+      - "8092:8090"
     environment:
       - DB_HOST=158.170.2.91
     networks:
@@ -63,7 +63,7 @@ services:
     container_name: backend3
     image: tomasmanriquez480/backend-image:latest
     ports:
-      - "8083:8080"
+      - "8093:8090"
     environment:
       - DB_HOST=158.170.2.91
     networks:
@@ -88,7 +88,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: admin
     ports:
-      - "5435:5433" #Docker recomendo en "", si no funca sin ""
+      - "5435:5432" #Docker recomendo en "", si no funca sin ""
       #ayudante tenia 5435:5432
 
 ####
@@ -112,9 +112,10 @@ services:
 
   #backload balancing
   nginx-backend:
+    container_name: nginx-backend
     image: nginx:latest
     ports:
-      - "80:80" #ayudante tiene puertos 80:80, yo tenia 8080:8080
+      - "8090:80" #ayudante tiene puertos 80:80, yo tenia 8080:8080
     #environment: DB_HOST, DB_PORT, DB_USERNAME, DB_PASSWORD
     volumes:
       - ./nginx-backend.conf:/etc/nginx/nginx.conf
