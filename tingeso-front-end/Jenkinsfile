@@ -5,8 +5,8 @@ pipeline{
             steps{
                 checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/tomas-manriquez/tingeso-2024-2']])
                 dir("tingeso-front-end"){
-                    bat "npm install"
-                    bat "npm run build"
+                    sh "npm install"
+                    sh "npm run build"
                 }
             }
         }
@@ -15,8 +15,8 @@ pipeline{
                 dir("tingeso-front-end"){
                     script{
                         withDockerRegistry(credentialsId: 'docker-credentials'){
-                            bat "docker build -t tomasmanriquez480/frontend-image:latest ."
-                            bat "docker push tomasmanriquez480/frontend-image:latest"
+                            sh "docker build -t tomasmanriquez480/frontend-image:latest ."
+                            sh "docker push tomasmanriquez480/frontend-image:latest"
                         }
                     }
                 }
