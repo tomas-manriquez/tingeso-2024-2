@@ -1,18 +1,14 @@
 package com.example.demo.service;
 
 import com.example.demo.entity.ClientEntity;
-import com.example.demo.entity.DocumentEntity;
 import com.example.demo.entity.RequestEntity;
 import com.example.demo.repository.ClientRepository;
 import com.example.demo.repository.RequestRepository;
-import org.apache.coyote.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.ObjectError;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Service

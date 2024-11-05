@@ -1,14 +1,11 @@
 package com.example.demo.service;
 
 import com.example.demo.entity.ClientEntity;
-import com.example.demo.entity.DocumentEntity;
 import com.example.demo.repository.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.Month;
-import java.time.Year;
 import java.util.ArrayList;
 import java.util.Optional;
 

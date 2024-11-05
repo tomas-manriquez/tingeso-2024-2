@@ -10,7 +10,7 @@ pipeline{
                 checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/tomas-manriquez/tingeso-2024-2']])
                 dir("demo"){
                     bat "mvn clean install"
-                }
+
             }
         }
         stage("Test"){
