@@ -5,6 +5,7 @@ pipeline{
             steps{
                 checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/tomas-manriquez/tingeso-2024-2']])
                 dir("tingeso-front-end"){
+                    sh "npm install npm"
                     sh "npm install"
                     sh "npm run build"
                 }
