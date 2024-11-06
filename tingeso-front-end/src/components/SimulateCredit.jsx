@@ -46,6 +46,7 @@ const SimulateCredit= () => {
             <form>
                 <FormControl fullWidth>
                     <TextField
+                        select
                         id="clientRut"
                         label="ClientRut"
                         value={clientRut}
