@@ -13,6 +13,8 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addMapping("/**")
                 .allowedOrigins(
                         "http://localhost:5173",
+                        "http://localhost:8090",
+                        "http://localhost:8090/api/clients/",
                         "http://192.168.100.13:8090",
                         "http://4.201.128.33:5173",
                         "http://4.201.128.33:8070"
